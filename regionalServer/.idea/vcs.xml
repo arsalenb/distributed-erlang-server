@@ -9,6 +9,8 @@
     <mapping directory="$PROJECT_DIR$/src/cowboy/examples/rest_hello_world/deps/cowlib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/cowboy/examples/rest_hello_world/deps/ranch" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/cowboy/examples/rest_hello_world/deps/relx" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/jsone/rebar3" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/regional_server/.erlang.mk/rebar" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/regional_server/deps/cowboy" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/regional_server/deps/cowlib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/regional_server/deps/ranch" vcs="Git" />
