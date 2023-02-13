@@ -4,6 +4,7 @@
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/cowboy/deps/cowlib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/cowboy/deps/ranch" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/cowboy/examples/rest_hello_world/.erlang.mk/rebar" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/cowboy/examples/rest_hello_world/deps/cowboy" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/cowboy/examples/rest_hello_world/deps/cowlib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/cowboy/examples/rest_hello_world/deps/ranch" vcs="Git" />
