@@ -10,7 +10,7 @@ SERVER_URL = 'http://localhost:8080'
 
 random_id = random.randint(0, 2000)
 print("ID ", random_id)
-random_data = round(random_id / random.randint(0, 200), 2)
+random_data = round(random_id / random.randint(0, 200), 4)
 print("Data ", random_data)
 timestamp = datetime.now()
 print("Date and Time: ", timestamp)
@@ -22,10 +22,20 @@ print("Date and Time: ", timestamp)
 ## the parse function uses the '&' to seaparate key value pairs in the string
 ## the data string format to be sent in the POST request is then: key1=value1&key2=value2&key3=value3...
 string_to_send = 'sensor_id='+str(random_id)+'&sensor_data='+str(random_data)+'&timestamp=' + str(timestamp) 
-print(string_to_send, '\n sending POST to server:')
+print(string_to_send, '\n sending SENSOR POST to server:')
 
 r = requests.post(SERVER_URL, data = string_to_send)
-print('Server Reply: ', r.text)
+print(r.status_code, ' Server Reply: ', r.text, '\n\n')
+
+string_to_send = 'server_id=SS'+str(random_id)+'&threshold=HIGH TEMP&value='+str(random_data+10)+'&timestamp=' + str(timestamp) 
+print(string_to_send, '\n sending SERVER POST to server:')
+
+r = requests.post(SERVER_URL, data = string_to_send)
+print(r.status_code, ' Server Reply: ', r.text, '\n\n Sending GET to Server:')
+
+#r = requests.get(SERVER_URL)
+#print(r.status_code, ' Server Reply: ', r.text)
+
 #print(f"Status Code: {r.status_code}, Response: {r.json()}")
 
 
