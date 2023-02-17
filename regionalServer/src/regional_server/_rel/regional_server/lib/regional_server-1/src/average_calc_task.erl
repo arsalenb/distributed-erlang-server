@@ -9,31 +9,32 @@
 -module(average_calc_task).
 -author("brunocasu").
 
+%% API
 -export([init/0, handle/2, return_avg/1]).
 
--import(regional_server_app, [rpc_avg/2]).
+-import(regional_server_app, [rpc_task/2]).
 
-init() -> [15,15,15,15,15].
+init() -> [15,15,15,15,15]. %% initial condition
 
-%% Returns current mobile average
+%% Returns mobile average of the 5 last values
 return_avg(Val) ->
     case is_integer(Val) of
-        true -> rpc_avg(avg, Val);
+        true -> rpc_task(avg, Val);
         _ -> badarg
     end.
 
-
 handle(Val, [_H | T]) -> %% Received H is discarded - The Last 5th reading is replaced by the new input value
     NewList = T ++ [Val], %% Add new value to the last 5 Data readings
+    io:fwrite("~p~n", ["List For Average Calculation:"]),
     io:fwrite("~w~n", [NewList]),
     SumList = sum(NewList),
     {SumList/5, NewList}. %% Returns mobile average of last 5 Readings
 
-sum(L) ->
+sum(L) -> %% Sum all values from the input list
     sum(L, 0).
 
-sum([H|T], Acc) ->
-    sum(T, H + Acc);
+sum([H|T], S) ->
+    sum(T, H + S);
 
-sum([], Acc) ->
-    Acc.
+sum([], S) ->
+    S.
