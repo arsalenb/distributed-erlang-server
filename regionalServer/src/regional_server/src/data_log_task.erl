@@ -17,19 +17,20 @@
 %% 2 Sensors are hardcoded in the Server
 %% Sensor Log is contained in a Tuple {ID, [DataList], [TimeList]}}
 %% Ids are 001 and 002
-init() -> {{[0], ["INIT"]}, {[0], ["INIT"]}}.
+init() -> {{[0], ["INIT"]}, {[0], ["INIT"]}}. %% initial condition
 
 log_access(Mode, ID, Data, Time) ->
   rpc_task(log, {Mode, ID, Data, Time}).
 
-
+%% The data log Task will handle incoming data from the Sensors
+%% Every new data entry, the handle function will append the data at the end of the DataList
 handle({Mode, ID, Data, Time}, {{DataList1, TimeList1}, {DataList2, TimeList2}}) ->
   case Mode of
     write ->
       case ID of
         id001 ->
           if
-            length(DataList1) < 100 ->
+            length(DataList1) < 50 -> %% Maximum size of Record is 50 readings
               UpdatedDataLog = append_list(DataList1, Data),
               UpdatedTimeLog = append_list(TimeList1, Time),
               {log_saved, {{UpdatedDataLog, UpdatedTimeLog}, {DataList2, TimeList2}}};
@@ -41,7 +42,7 @@ handle({Mode, ID, Data, Time}, {{DataList1, TimeList1}, {DataList2, TimeList2}})
         ;
         id002 ->
           if
-            length(DataList2) < 100 ->
+            length(DataList2) < 50 -> %% Maximum size of Record is 50 readings
               UpdatedDataLog = append_list(DataList2, Data),
               UpdatedTimeLog = append_list(TimeList2, Time),
               {log_saved, {{DataList1, TimeList1}, {UpdatedDataLog, UpdatedTimeLog}}};

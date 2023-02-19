@@ -1,4 +1,5 @@
-%% Feel free to use, reuse and abuse the code in this file.
+%%%-------------------------------------------------------------------
+%%% @author brunocasu
 
 %% @doc POST echo handler.
 -module(toppage_h).
@@ -28,17 +29,20 @@ server_request_handler(<<"POST">>, true, Req0) ->
 			DataBin = proplists:get_value(<<"sensor_data">>, PostContentBin),
 			TimeBin = proplists:get_value(<<"time">>, PostContentBin),
 			%% Store received data
-			log_access(write, id001, binary_to_integer(DataBin), binary_to_list(TimeBin)),
-			%% Compute mobile average and send reply
+			case SensorIDBin of
+				<<"001">> -> log_access(write, id001, binary_to_integer(DataBin), binary_to_list(TimeBin));
+				<<"002">> -> log_access(write, id002, binary_to_integer(DataBin), binary_to_list(TimeBin));
+				_ -> unidentified_id
+			end,
+			%% Compute mobile average of all sensors in the region and send echo reply
 			AvgFloat = return_avg(binary_to_integer(DataBin)),
 			case is_float(AvgFloat) of
 				true ->
 					EchoHeader = <<"Regional Server ID: RS001 Echo Data: ">>,
 					Body = <<EchoHeader/binary, DataBin/binary>>,
 					server_reply(Body, Req),
-
 					AvgBin = float_to_binary(AvgFloat, [{decimals, 4}]),
-					if
+					if %% Check if the threshold value was crossed with the new data received
 						AvgFloat > 21 -> threshold_crossed_handler(AvgBin, SensorIDBin, TimeBin);
 						true -> th_not_crossed
 					end;
@@ -49,25 +53,13 @@ server_request_handler(<<"POST">>, true, Req0) ->
 
 		"th_crossed" ->
 			io:fwrite("~p~n", ["Threshold Crossed Message..."]),
-			server_reply(<<"ok">>, Req);
-			%io:fwrite("~p~n", [binary_to_list(PostContentBin)]);
+			server_reply(<<"Threshold Coressed Echo">>, Req);
 		_ -> server_reply(undefined, Req)
 	end;
 
 server_request_handler(<<"GET">>, _, Req0) ->
 	io:fwrite("~p~n", ["GET Handler..."]),
-	Body = <<"<html>
-<head>
-	<meta charset=\"utf-8\">
-	<title>REST Regional Server</title>
-</head>
-<body>
-	<p>REST Regional Server HTML - GET response</p>
-</body>
-</html>">>,
-	{DataLog, TimeLog} = log_access(read, id001, [], []),
-	io:fwrite("~p~n", [DataLog]),
-	io:fwrite("~p~n", [TimeLog]),
+	Body = build_html_data_table(),
 	server_reply_html(Body, Req0);
 
 server_request_handler(<<"POST">>, false, Req) ->
@@ -102,3 +94,77 @@ server_reply_html(Content, Req) ->
 		<<"content-type">> => <<"text/html; charset=utf-8">>
 	}, Content, Req).
 
+%<p>REST Regional Server HTML - GET response</p>
+build_html_data_table() ->
+	BodyTitle = <<"<html>
+<head>
+	<meta charset=\"utf-8\">
+	<title>RS001 TOP PAGE</title>
+		<style>
+	h1 {text-align: center;}
+	h2 {text-align: center;}
+	h3 {text-align: center;}
+	p {text-align: center;}
+	</style>
+</head>
+<body>">>,
+	BodyEnd = <<"
+</body>
+</html>">>,
+	Header =
+		<<"<h1>REGIONAL MONITORING SERVER - ID: RS001</h1>
+				<h2>REGION TEMPERATURE (AVERAGE):
+		">>,
+	AvgFloat = return_avg(read),
+	AvgList = float_to_list(AvgFloat, [{decimals, 2}]),
+	io:fwrite("~p~n", ["Average:"]),
+	io:fwrite("~p~n", [AvgList]),
+	AvgBin = float_to_binary(AvgFloat, [{decimals, 2}]),
+	Unit = <<"<span>&#176;</span>C</h2>">>,
+	HeaderWithAvg = <<Header/binary, AvgBin/binary, Unit/binary>>,
+	TableHeader = <<"<h3>SENSOR 001	DATA LOG
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	SENSOR 002 DATA LOG</h3>">>,
+	{DataLog1, TimeLog1} = log_access(read, id001, [], []),
+	{DataLog2, TimeLog2} = log_access(read, id002, [], []),
+	Table = build_data_table(reverse(DataLog1), reverse(TimeLog1), reverse(DataLog2), reverse(TimeLog2)),
+	Body = <<BodyTitle/binary, HeaderWithAvg/binary, TableHeader/binary, Table/binary, BodyEnd/binary>>,
+	Body.
+
+build_data_table([D1H | D1T], [T1H | T1T], [D2H | D2T], [T2H | T2T]) ->
+	Front = <<"<p>">>,
+	Mid = <<"<span>&#176;</span>C
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">>,
+	End = <<"<span>&#176;</span>C</p>">>,
+	Data1Bin = integer_to_binary(D1H),
+	Time1Bin = list_to_binary(T1H),
+	Space = <<"&nbsp;&nbsp;&nbsp;&nbsp;">>,
+	Combined1 = <<Time1Bin/binary, Space/binary, Data1Bin/binary>>,
+	Data2Bin = integer_to_binary(D2H),
+	Time2Bin = list_to_binary(T2H),
+	Combined2 = <<Time2Bin/binary, Space/binary, Data2Bin/binary>>,
+	Line = <<Front/binary, Combined1/binary, Mid/binary, Combined2/binary, End/binary>>,
+	build_data_table(D1T, T1T, D2T, T2T, Line).
+
+build_data_table([D1H | D1T], [T1H | T1T], [D2H | D2T], [T2H | T2T], TableBin) ->
+	Front = <<"<p>">>,
+	Mid = <<"<span>&#176;</span>C
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">>,
+	End = <<"<span>&#176;</span>C</p>">>,
+	Data1Bin = integer_to_binary(D1H),
+	Time1Bin = list_to_binary(T1H),
+	Space = <<"&nbsp;&nbsp;&nbsp;&nbsp;">>,
+	Combined1 = <<Time1Bin/binary, Space/binary, Data1Bin/binary>>,
+	Data2Bin = integer_to_binary(D2H),
+	Time2Bin = list_to_binary(T2H),
+	Combined2 = <<Time2Bin/binary, Space/binary, Data2Bin/binary>>,
+	NewTable = <<TableBin/binary, Front/binary, Combined1/binary, Mid/binary, Combined2/binary, End/binary>>,
+	build_data_table(D1T, T1T, D2T, T2T, NewTable);
+build_data_table([], [], [], [], TableBin) ->
+	TableBin.
+
+reverse([]) -> [];
+reverse([H | T]) -> reverse(T) ++ [H].

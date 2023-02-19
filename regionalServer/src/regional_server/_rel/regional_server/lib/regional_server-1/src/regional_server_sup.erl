@@ -1,4 +1,5 @@
-%% Feel free to use, reuse and abuse the code in this file.
+%%%-------------------------------------------------------------------
+%%% @author brunocasu
 
 %% @private
 -module(regional_server_sup).
