@@ -28,7 +28,10 @@ return_avg(Val) -> %% New value to be used in the Average calculation
 
 handle(read, CurrentList) ->
     SumList = sum(CurrentList),
-    {SumList/6, CurrentList};
+    if
+        SumList/6 > 21 -> {{SumList/6, <<"&nbsp;&nbsp;WARNING! THRESHOLD CROSSED">>}, CurrentList}; %% HTML message
+        true -> {{SumList/6, <<"">>}, CurrentList}
+    end;
 
 handle(Val, [_H | T]) -> %% Received H is discarded (oldest reading)
     NewList = T ++ [Val], %% Add new value to the last 6 Data readings

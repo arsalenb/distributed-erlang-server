@@ -17,7 +17,7 @@
 %% 2 Sensors are hardcoded in the Server
 %% Sensor Log is contained in a Tuple {ID, [DataList], [TimeList]}}
 %% Ids are 001 and 002
-init() -> {{[0], ["INIT"]}, {[0], ["INIT"]}}. %% initial condition
+init() -> {{[0], ["yyyy-mm-ddThh:mm:ss"]}, {[0], ["yyyy-mm-ddThh:mm:ss"]}}. %% initial condition
 
 log_access(Mode, ID, Data, Time) ->
   rpc_task(log, {Mode, ID, Data, Time}).

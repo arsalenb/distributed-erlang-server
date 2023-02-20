@@ -2,6 +2,8 @@
 
 src/average_calc_task.erl:: src/regional_server_app.erl; @touch $@
 src/data_log_task.erl:: src/regional_server_app.erl; @touch $@
-src/toppage_h.erl:: src/average_calc_task.erl src/data_log_task.erl; @touch $@
+src/msg_formating.erl:: src/average_calc_task.erl src/data_log_task.erl; @touch $@
+src/post_request_task.erl:: src/regional_server_app.erl; @touch $@
+src/toppage_h.erl:: src/average_calc_task.erl src/data_log_task.erl src/msg_formating.erl src/post_request_task.erl; @touch $@
 
-COMPILE_FIRST += regional_server_app data_log_task average_calc_task
+COMPILE_FIRST += regional_server_app post_request_task data_log_task average_calc_task msg_formating

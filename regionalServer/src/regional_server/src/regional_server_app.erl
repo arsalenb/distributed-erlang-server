@@ -15,12 +15,14 @@
 start(_Type, _Args) ->
 	start_task(avg, average_calc_task),
 	start_task(log, data_log_task),
+	start_task(post_req, post_request_task),
+	start_task(event, event_handler_task),
 	Dispatch = cowboy_router:compile([
 		{'_', [
 			{"/", toppage_h, []}
 		]}
 	]),
-	{ok, _} = cowboy:start_clear(http, [{port, 8080}], #{
+	{ok, _} = cowboy:start_clear(http, [{port, 8080}], #{ %% TODO deploy in IP 10.2.1.28
 		env => #{dispatch => Dispatch}
 	}),
 	regional_server_sup:start_link(). %% Start link function from _sup.erl

@@ -32,6 +32,9 @@ for i in range(10):
     print(random_data1, '    ', random_data2)
     #print(string_to_send1, '\n POST REQUEST:\n', r1.status_code, ' Server Reply: ', r1.text, '\n\n')
     #print(string_to_send2, '\n POST REQUEST:\n', r2.status_code, ' Server Reply: ', r2.text, '\n\n')
+timestamp = datetime.now().isoformat(timespec='seconds') 
+string_to_send = 'msg_type=data_tx&sensor_id=001&sensor_data=50&time=' + str(timestamp) # High Data value
+r = requests.post(SERVER_URL, data = string_to_send)
 
 #string_to_send = 'server_id=SS'+str(random_id)+'&threshold=HIGH TEMP&value='+str(random_data+10)+'&timestamp=' + str(timestamp) 
 #print(string_to_send, '\n sending SERVER POST to server:')
