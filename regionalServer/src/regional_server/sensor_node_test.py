@@ -19,13 +19,13 @@ SERVER_URL = 'http://localhost:8080'
 
 for i in range(10):
     timestamp = datetime.now().isoformat(timespec='seconds') 
-    random_data1 = random.randint(10, 30)
+    random_data1 = random.randint(10, 50)
     string_to_send = 'msg_type=data_tx&sensor_id=001&sensor_data='+str(random_data1)+'&time=' + str(timestamp)
-    r = requests.post(SERVER_URL, data = string_to_send)
+    #r = requests.post(SERVER_URL, data = string_to_send)
     sleep(random.randint(1, 3))
     
     timestamp = datetime.now().isoformat(timespec='seconds') 
-    random_data2 = random.randint(10, 30)
+    random_data2 = random.randint(10, 50)
     string_to_send = 'msg_type=data_tx&sensor_id=002&sensor_data='+str(random_data2)+'&time=' + str(timestamp)
     r = requests.post(SERVER_URL, data = string_to_send)
     sleep(random.randint(1, 3))

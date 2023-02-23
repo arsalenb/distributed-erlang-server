@@ -1,5 +1,5 @@
 %% coding: utf-8
-%% script generated at {2023,2,19} {19,50,17}
+%% script generated at {2023,2,23} {1,31,10}
 {script,
     {"regional_server","1"},
     [{preLoaded,
@@ -93,8 +93,9 @@
           cowboy_sup,cowboy_tls,cowboy_tracer_h,cowboy_websocket]},
      {path,["$ROOT/lib/regional_server-1/ebin"]},
      {primLoad,
-         [average_calc_task,data_log_task,msg_formating,post_request_task,
-          regional_server_app,regional_server_sup,toppage_h]},
+         [average_calc_task,data_log_task,event_handler_task,msg_formatting,
+          post_request_task,regional_server_app,regional_server_sup,
+          toppage_h]},
      {progress,modules_loaded},
      {path,
          ["$ROOT/lib/kernel-6.5.1/ebin","$ROOT/lib/stdlib-3.11.2/ebin",
@@ -322,8 +323,8 @@
                    {vsn,"1"},
                    {id,[]},
                    {modules,
-                       [average_calc_task,data_log_task,msg_formating,
-                        post_request_task,regional_server_app,
+                       [average_calc_task,data_log_task,event_handler_task,
+                        msg_formatting,post_request_task,regional_server_app,
                         regional_server_sup,toppage_h]},
                    {registered,[regional_server_sup]},
                    {applications,[kernel,stdlib,cowboy]},

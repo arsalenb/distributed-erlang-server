@@ -6,13 +6,10 @@
 
 -export([init/2]).
 
--import(average_calc_task, [return_avg/1]).
--import(data_log_task, [log_access/4]).
--import(post_request_task, [post_msg/3]).
--import(event_handler_taskm [event_handler/2])
+-import(event_handler_task, [event_handler/2]).
 -import(msg_formatting, [build_html_data_table/0, build_json_data_table/0]).
 
-%% Called when cowboy listener ges a message
+%% Called when cowboy listener receives a message
 init(Req0, Opts) ->
 	io:fwrite("~p~n", ["Message Received..."]),
 	Method = cowboy_req:method(Req0),
@@ -32,10 +29,9 @@ server_request_handler(<<"POST">>, true, Req0) ->
 			%% Send data to Event Handler (Save data in the logs, compute the Average Temperature on the region and manage events)
 			event_handler(write_data, PostContentBin);
 
-
 		"request_data" -> %% Sent by the webserver node
 			io:fwrite("~p~n", ["Request Data..."]),
-			Body = build_json_data_table(), %% TODO Implement the POST request response for the Tomcat server - json string
+			Body = build_json_data_table(), % TODO Implement the POST request response for the Tomcat server - json string
 			server_reply(Body, Req);
 
 		"event" -> %% Sent by the other monitoring servers - contains source server ID, Type of event, Data value and Timestamp

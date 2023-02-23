@@ -10,15 +10,15 @@
 -author("brunocasu").
 
 %% API
--export([init/0, handle/2, post_msg/3]).
+-export([init/0, handle/2, post_msg/4]).
 
 -import(regional_server_app, [rpc_task/2]).
 
-init() -> [].
+init() -> msg.
 
-post_msg(_ServerIDBin, _DataValBin, _TimeBin) -> rpc_task(post_req, {}).
+post_msg(_ServerIDBin, _EventType, _DataValBin, _TimeBin) -> rpc_task(post_req, msg).
 
-handle(msg, {}) -> msg.
+handle(msg, _State) -> {msg, ok}.
 
 %io:fwrite("~p~n", ["Sensor Threshold Crossed - Sending Msg to http://localhost:8080"]),
   %Url = "http://localhost:8080",

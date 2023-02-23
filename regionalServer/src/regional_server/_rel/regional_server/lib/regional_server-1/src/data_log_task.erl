@@ -15,9 +15,9 @@
 -import(regional_server_app, [rpc_task/2]).
 
 %% 2 Sensors are hardcoded in the Server
-%% Sensor Log is contained in a Tuple {ID, [DataList], [TimeList]}}
-%% Ids are 001 and 002
-init() -> {{[0], ["yyyy-mm-ddThh:mm:ss"]}, {[0], ["yyyy-mm-ddThh:mm:ss"]}}. %% initial condition
+%% Sensor Log is made of 2 Tuples: {{[Data1List], [Timestamp1List]}, {[Data2List], [Timestamp2List]}}}
+%% Each tuple has the list for one sensor data log and respective timestamp
+init() -> {{[0], ["yy-mm-ddThh:mm:ss"]}, {[0], ["yy-mm-ddThh:mm:ss"]}}. %% initial condition
 
 log_access(Mode, ID, Data, Time) ->
   rpc_task(log, {Mode, ID, Data, Time}).

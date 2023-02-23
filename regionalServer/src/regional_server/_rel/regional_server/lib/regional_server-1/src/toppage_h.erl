@@ -6,17 +6,15 @@
 
 -export([init/2]).
 
--import(average_calc_task, [return_avg/1]).
--import(data_log_task, [log_access/4]).
--import(post_request_task, [post_msg/3]).
--import(msg_formating, [build_html_data_table/0, build_json_data_table/0]).
+-import(event_handler_task, [event_handler/2]).
+-import(msg_formatting, [build_html_data_table/0, build_json_data_table/0]).
 
-
+%% Called when cowboy listener receives a message
 init(Req0, Opts) ->
 	io:fwrite("~p~n", ["Message Received..."]),
 	Method = cowboy_req:method(Req0),
 	HasBody = cowboy_req:has_body(Req0),
-	Req = server_request_handler(Method, HasBody, Req0),
+	Req = server_request_handler(Method, HasBody, Req0), %% handles the request
 	{ok, Req, Opts}.
 
 %% Handler for POST/GET messages
@@ -25,39 +23,23 @@ server_request_handler(<<"POST">>, true, Req0) ->
 	{ok, PostContentBin, Req} = cowboy_req:read_urlencoded_body(Req0),
 	MsgTypeBin = proplists:get_value(<<"msg_type">>, PostContentBin),
 	case binary_to_list(MsgTypeBin) of
-		"data_tx" ->
-			io:fwrite("~p~n", ["Sensor Data Transmission..."]),
-			SensorIDBin = proplists:get_value(<<"sensor_id">>, PostContentBin),
-			DataBin = proplists:get_value(<<"sensor_data">>, PostContentBin),
-			TimeBin = proplists:get_value(<<"time">>, PostContentBin),
-			%% Store received data
-			case SensorIDBin of
-				<<"001">> -> log_access(write, id001, binary_to_integer(DataBin), binary_to_list(TimeBin));
-				<<"002">> -> log_access(write, id002, binary_to_integer(DataBin), binary_to_list(TimeBin));
-				_ -> unidentified_id
-			end,
-			%% Compute mobile average of all sensors in the region and send echo reply
-			AvgFloat = return_avg(binary_to_integer(DataBin)),
-			case is_float(AvgFloat) of
-				true ->
-					EchoHeader = <<"Regional Server ID: RS001 Echo Data: ">>,
-					Body = <<EchoHeader/binary, DataBin/binary>>,
-					server_reply(Body, Req),
-					AvgBin = float_to_binary(AvgFloat, [{decimals, 4}]),
-					if %% Check if the threshold value was crossed with the new data received
-						AvgFloat > 21 -> post_msg(<<"RS001">>, AvgBin, TimeBin); %% TODO Implement the POST request in separate Task
-						true -> th_not_crossed
-					end;
-				_ -> server_reply(undefined, Req)
-			end;
-		"request_data" ->
-			Body = build_json_data_table(), %% TODO Implement the POST request response for the Tomcat server - json string
-			server_reply(Body, Req),
-			io:fwrite("~p~n", ["Request Data..."]);
+		"data_tx" -> %% Sent by the sensor nodes - msg contains sensor ID, Data and Timestamp
+			io:fwrite("~p~n", ["Sensor Data Received..."]),
+			server_reply(<<"Regional Server ID: RS001 Echo">>, Req),
+			%% Send data to Event Handler (Save data in the logs, compute the Average Temperature on the region and manage events)
+			event_handler(write_data, PostContentBin);
 
-		"th_crossed" ->
-			io:fwrite("~p~n", ["Threshold Crossed Message..."]),
-			server_reply(<<"Threshold Crossed Echo">>, Req);
+		"request_data" -> %% Sent by the webserver node
+			io:fwrite("~p~n", ["Request Data..."]),
+			Body = build_json_data_table(), % TODO Implement the POST request response for the Tomcat server - json string
+			server_reply(Body, Req);
+
+		"event" -> %% Sent by the other monitoring servers - contains source server ID, Type of event, Data value and Timestamp
+			io:fwrite("~p~n", ["Event Received..."]),
+			server_reply(<<"Regional Server ID: RS001 Echo">>, Req),
+			%% Send event to Event Handler (Save the event information in the logs)
+			event_handler(write_event, PostContentBin);
+
 		_ -> server_reply(undefined, Req)
 	end;
 
