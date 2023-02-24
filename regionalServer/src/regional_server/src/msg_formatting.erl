@@ -10,7 +10,7 @@
 -author("brunocasu").
 
 %% API
--export([build_html_data_table/0, build_json_data_table/0]).
+-export([build_html_data_table/0, build_json_data_table/0, build_event_message/0]).
 
 -import(average_calc_task, [return_avg/1]).
 -import(data_log_task, [log_access/4]).
@@ -208,6 +208,8 @@ build_data_table([], [], [], [], [], TableBin) ->
   TableBin.
 
 build_json_data_table() -> []. %% TODO
+
+build_event_message() -> []. %% TODO
 
 reverse([]) -> [];
 reverse([H | T]) -> reverse(T) ++ [H].

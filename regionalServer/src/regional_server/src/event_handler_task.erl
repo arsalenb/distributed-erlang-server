@@ -15,7 +15,7 @@
 -import(regional_server_app, [rpc_task/2]).
 -import(average_calc_task, [return_avg/1]).
 -import(data_log_task, [log_access/4]).
--import(post_request_task, [post_msg/4]).
+-import(post_request_task, [post_msg/3]).
 
 
 init() -> ["Monitoring Start: No Warnings - Date/Time: yyyy-mm-ddThh:mm:ss XX C"].
@@ -25,20 +25,26 @@ event_handler(Mode, PostContentBin) ->
 
 %% The write_data mode is used when new data is received by the server, and need to be handled
 handle({write_data, PostContentBin}, EventList) ->
+  UPPER_TS_VAL = 21,
+  LOWER_TS_VAL = 11,
   SensorIDBin = proplists:get_value(<<"sensor_id">>, PostContentBin),
   DataBin = proplists:get_value(<<"sensor_data">>, PostContentBin),
   TimeBin = proplists:get_value(<<"time">>, PostContentBin),
-  %% Store received data
+%% Forward received Data to webserver - json format
+  post_msg(data, {SensorIDBin, DataBin, TimeBin}, "http://localhost:8080"),
+%% Store received data and timestamp in the Log
   case SensorIDBin of
     <<"001">> -> log_access(write, id001, binary_to_integer(DataBin), binary_to_list(TimeBin));
     <<"002">> -> log_access(write, id002, binary_to_integer(DataBin), binary_to_list(TimeBin));
     _ -> unidentified_id
   end,
-  AvgFloat = return_avg(binary_to_integer(DataBin)), %% Add new entry to Average calculation list
+%% Add new entry to Average calculation list
+  AvgFloat = return_avg(binary_to_integer(DataBin)),
   io:fwrite("~p~n", ["Average Temp:"]),
   io:fwrite("~p~n", [float_to_list(AvgFloat, [{decimals, 2}])]),
-  if %% Data check
-    AvgFloat > 21 -> %% Upper Temp Threshold Crossed
+%% Data check - if a threshold is crossed, a new entry to the Event list is added
+  if
+    AvgFloat > UPPER_TS_VAL -> %% Upper Temp Threshold Crossed
       AvgBin = float_to_binary(AvgFloat, [{decimals, 2}]),
       io:fwrite("~p~n", ["Upper Temp Threshold Crossed..."]),
       WarningHeader = <<"RS001 Warning! UPPER_TS Crossed at: ">>,
@@ -49,9 +55,10 @@ handle({write_data, PostContentBin}, EventList) ->
       EventRecordBin = <<WarningHeader/binary, TimeBin/binary, Space/binary,
         AvgBin/binary, Unit/binary, SensorIDBin/binary, Reading/binary, DataBin/binary, End/binary>>,
       NewEventList = append_list(EventList, binary_to_list(EventRecordBin)),
-      post_msg(<<"RS001">>, <<"UPPER_TS">>, AvgBin, TimeBin),
-      {ok, NewEventList}; %% TODO Implement the POST request to RS002
-    AvgFloat < 11 -> %% Lower Temp Threshold Crossed
+%% Send Event to other monitoring servers
+      post_msg(event, EventRecordBin, "http://localhost:8081"), %% TODO Implement the POST request to RS002
+      {ok, NewEventList};
+    AvgFloat < LOWER_TS_VAL -> %% Lower Temp Threshold Crossed
       AvgBin = float_to_binary(AvgFloat, [{decimals, 2}]),
       io:fwrite("~p~n", ["Lower Temp Threshold Crossed..."]),
       WarningHeader = <<"RS001 Warning! LOWER_TS Crossed at: ">>,
@@ -63,28 +70,19 @@ handle({write_data, PostContentBin}, EventList) ->
         AvgBin/binary, Unit/binary, SensorIDBin/binary, Reading/binary, DataBin/binary, End/binary>>,
       NewEventList = append_list(EventList, binary_to_list(EventRecordBin)),
       AvgBin = float_to_binary(AvgFloat, [{decimals, 2}]),
-      post_msg(<<"RS001">>, <<"LOWER_TS">>, AvgBin, TimeBin),
-      {ok, NewEventList}; %% TODO Implement the POST request to RS002
+%% Send Event to other monitoring servers
+      post_msg(event, EventRecordBin, "http://localhost:8081"), %% TODO Implement the POST request to RS002
+      {ok, NewEventList};
     true -> {no_event, EventList}
   end;
 
 
 %% The write_event mode is used when an event message is received by the server, and need to be stored in the records
 handle({write_event, PostContentBin}, EventList) ->
-  ServerIDBin = proplists:get_value(<<"server_id">>, PostContentBin),
-  EventBin = proplists:get_value(<<"event">>, PostContentBin),
-  DataBin = proplists:get_value(<<"sensor_data">>, PostContentBin),
-  TimeBin = proplists:get_value(<<"time">>, PostContentBin),
-  io:fwrite("~p~n", [binary_to_list(ServerIDBin)]),
-  io:fwrite("~p~n", [binary_to_list(EventBin)]),
-  WarningHeader = <<"&nbsp;Warning!&nbsp;">>,
-  WarningType = <<"&nbsp;Crossed - Date/Time:&nbsp;">>,
-  Space = <<"&nbsp;&nbsp;&nbsp;&nbsp;Temp:&nbsp;">>,
-  WarningEnd = <<"<span>&#176;</span>C">>,
-  EventRecordBin = <<WarningHeader/binary, EventBin/binary, WarningType/binary,
-  TimeBin/binary, Space/binary, DataBin/binary, WarningEnd/binary>>,
+  MAX_LOG_SIZE = 50,
+  EventRecordBin = proplists:get_value(<<"event_info">>, PostContentBin),
   if
-    length(EventList) < 50 ->
+    length(EventList) < MAX_LOG_SIZE ->
       NewEventList = append_list(EventList, binary_to_list(EventRecordBin)),
       {ok, NewEventList};
     true ->

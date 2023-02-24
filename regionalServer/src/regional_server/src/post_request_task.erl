@@ -10,13 +10,14 @@
 -author("brunocasu").
 
 %% API
--export([init/0, handle/2, post_msg/4]).
+-export([init/0, handle/2, post_msg/3]).
 
 -import(regional_server_app, [rpc_task/2]).
+-import(msg_formatting, [build_json_data_table/0, build_event_message/0]).
 
 init() -> msg.
 
-post_msg(_ServerIDBin, _EventType, _DataValBin, _TimeBin) -> rpc_task(post_req, msg).
+post_msg(_MsgType, _Body, _Url) -> rpc_task(post_req, msg).
 
 handle(msg, _State) -> {msg, ok}.
 
