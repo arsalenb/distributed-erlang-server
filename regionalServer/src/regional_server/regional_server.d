@@ -4,7 +4,7 @@ src/average_calc_task.erl:: src/regional_server_app.erl; @touch $@
 src/data_log_task.erl:: src/regional_server_app.erl; @touch $@
 src/event_handler_task.erl:: src/average_calc_task.erl src/data_log_task.erl src/post_request_task.erl src/regional_server_app.erl; @touch $@
 src/msg_formatting.erl:: src/average_calc_task.erl src/data_log_task.erl src/event_handler_task.erl; @touch $@
-src/post_request_task.erl:: src/regional_server_app.erl; @touch $@
+src/post_request_task.erl:: src/msg_formatting.erl src/regional_server_app.erl; @touch $@
 src/toppage_h.erl:: src/event_handler_task.erl src/msg_formatting.erl; @touch $@
 
 COMPILE_FIRST += regional_server_app post_request_task data_log_task average_calc_task event_handler_task msg_formatting

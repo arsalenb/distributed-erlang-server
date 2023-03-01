@@ -15,7 +15,7 @@
 -import(regional_server_app, [rpc_task/2]).
 -import(average_calc_task, [return_avg/1]).
 -import(data_log_task, [log_access/4]).
--import(post_request_task, [post_msg/2]).
+-import(post_request_task, [post_msg/3]).
 
 
 init() -> ["Monitoring Start: No Warnings - Date/Time: yyyy-mm-ddThh:mm:ss XX C"].
@@ -30,16 +30,20 @@ handle({write_data, PostContentBin}, EventList) ->
   SensorIDBin = proplists:get_value(<<"sensor_id">>, PostContentBin),
   DataBin = proplists:get_value(<<"sensor_data">>, PostContentBin),
   TimeBin = proplists:get_value(<<"time">>, PostContentBin),
-  %% Store received data
+%% Forward received Data to webserver - json format
+  post_msg(data, {SensorIDBin, DataBin, TimeBin}, "http://localhost:8080"),
+%% Store received data and timestamp in the Log
   case SensorIDBin of
     <<"001">> -> log_access(write, id001, binary_to_integer(DataBin), binary_to_list(TimeBin));
     <<"002">> -> log_access(write, id002, binary_to_integer(DataBin), binary_to_list(TimeBin));
     _ -> unidentified_id
   end,
-  AvgFloat = return_avg(binary_to_integer(DataBin)), %% Add new entry to Average calculation list
+%% Add new entry to Average calculation list
+  AvgFloat = return_avg(binary_to_integer(DataBin)),
   io:fwrite("~p~n", ["Average Temp:"]),
   io:fwrite("~p~n", [float_to_list(AvgFloat, [{decimals, 2}])]),
-  if %% Data check
+%% Data check - if a threshold is crossed, a new entry to the Event list is added
+  if
     AvgFloat > UPPER_TS_VAL -> %% Upper Temp Threshold Crossed
       AvgBin = float_to_binary(AvgFloat, [{decimals, 2}]),
       io:fwrite("~p~n", ["Upper Temp Threshold Crossed..."]),
@@ -51,8 +55,9 @@ handle({write_data, PostContentBin}, EventList) ->
       EventRecordBin = <<WarningHeader/binary, TimeBin/binary, Space/binary,
         AvgBin/binary, Unit/binary, SensorIDBin/binary, Reading/binary, DataBin/binary, End/binary>>,
       NewEventList = append_list(EventList, binary_to_list(EventRecordBin)),
-      post_msg(EventRecordBin, "http://localhost:8080"),
-      {ok, NewEventList}; %% TODO Implement the POST request to RS002
+%% Send Event to other monitoring servers
+      post_msg(event, EventRecordBin, "http://localhost:8081"), %% TODO Implement the POST request to RS002
+      {ok, NewEventList};
     AvgFloat < LOWER_TS_VAL -> %% Lower Temp Threshold Crossed
       AvgBin = float_to_binary(AvgFloat, [{decimals, 2}]),
       io:fwrite("~p~n", ["Lower Temp Threshold Crossed..."]),
@@ -65,8 +70,9 @@ handle({write_data, PostContentBin}, EventList) ->
         AvgBin/binary, Unit/binary, SensorIDBin/binary, Reading/binary, DataBin/binary, End/binary>>,
       NewEventList = append_list(EventList, binary_to_list(EventRecordBin)),
       AvgBin = float_to_binary(AvgFloat, [{decimals, 2}]),
-      post_msg(EventRecordBin, "http://localhost:8080"),
-      {ok, NewEventList}; %% TODO Implement the POST request to RS002
+%% Send Event to other monitoring servers
+      post_msg(event, EventRecordBin, "http://localhost:8081"), %% TODO Implement the POST request to RS002
+      {ok, NewEventList};
     true -> {no_event, EventList}
   end;
 
