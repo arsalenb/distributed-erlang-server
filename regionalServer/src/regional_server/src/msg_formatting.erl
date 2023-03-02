@@ -20,7 +20,7 @@ build_html_data_table() ->
   BodyTitle = <<"<html>
 <head>
 	<meta charset=\"utf-8\">
-	<title>MONITORING SERVER RS001</title>
+	<title>MONITORING SERVER XXXX</title>
 		<style>
 	h1 {text-align: center;}
 	h2 {text-align: center;}
@@ -31,7 +31,7 @@ build_html_data_table() ->
 </body>
 </html>">>,
   Header =
-    <<"<h1>REGIONAL MONITORING SERVER - ID: RS001</h1>
+    <<"<h1>REGIONAL MONITORING SERVER - ID: XXXXX</h1>
 				<h2>REGION TEMPERATURE (AVERAGE):
 		">>,
   AvgFloat = return_avg(read),
@@ -40,20 +40,24 @@ build_html_data_table() ->
   io:fwrite("~p~n", [AvgList]),
   AvgBin = float_to_binary(AvgFloat, [{decimals, 2}]),
   Unit = <<"<span>&#176;</span>C</h2>">>,
-  %CloseHeader = <<"</h2>">>,
-  HeaderWithAvg = <<Header/binary, AvgBin/binary, Unit/binary>>, %StatusBin/binary, CloseHeader/binary>>,
+  HeaderWithAvg = <<Header/binary, AvgBin/binary, Unit/binary>>,
+  ConnectedNodes = nodes(), %% list of atoms
+  NodesBin = serialize_nodes(ConnectedNodes),
+  NodesHeader = <<"<h2> CONNECTED NODES: ">>,
+  NodesHeaderEnd = <<"</h2>">>,
+  CompleteHeader = <<HeaderWithAvg/binary, NodesHeader/binary, NodesBin/binary, NodesHeaderEnd/binary>>,
   TableHeader = <<"<h3>&nbsp;&nbsp
-  SENSOR 001	DATA LOG
+  SENSOR AAA	DATA LOG
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	&nbsp;&nbsp;
-	SENSOR 002 DATA LOG
+	SENSOR BBB DATA LOG
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	WARNINGS/EVENTS</h3>">>,
   {DataLog1, TimeLog1, DataLog2, TimeLog2} = log_access(read, [], [], []),
   EventLog = event_handler(read, []),
   Table = build_data_table(reverse(DataLog1), reverse(TimeLog1), reverse(DataLog2), reverse(TimeLog2), reverse(EventLog)),
-  Body = <<BodyTitle/binary, HeaderWithAvg/binary, TableHeader/binary, Table/binary, BodyEnd/binary>>,
+  Body = <<BodyTitle/binary, CompleteHeader/binary, TableHeader/binary, Table/binary, BodyEnd/binary>>,
   Body.
 
 build_data_table([D1H | D1T], [T1H | T1T], [D2H | D2T], [T2H | T2T], [EH | ET]) ->
@@ -61,7 +65,6 @@ build_data_table([D1H | D1T], [T1H | T1T], [D2H | D2T], [T2H | T2T], [EH | ET]) 
   Unit = <<"<span>&#176;</span>C
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;">>,
-  %End = <<"<span>&#176;</span>C</p>">>,
   Data1Bin = integer_to_binary(D1H),
   Time1Bin = list_to_binary(T1H),
   Space = <<"&nbsp;&nbsp;&nbsp;&nbsp;">>,
@@ -206,7 +209,7 @@ build_data_table([], [], [], [], [], TableBin) ->
   TableBin.
 
 build_event_record(upts, TimeBin, AvgBin, SensorIDBin, DataBin) ->
-  WarningHeader = <<"RS001 Warning! UPPER_TS Crossed at: ">>,
+  WarningHeader = <<"XXXX Warning! UPPER_TS Crossed at: ">>,
   Space = <<" / Avg: ">>,
   Unit = <<" C - Received From Sensor: ">>,
   Reading = <<" - Reading: ">>,
@@ -216,7 +219,7 @@ build_event_record(upts, TimeBin, AvgBin, SensorIDBin, DataBin) ->
   binary_to_list(EventRecordBin);
 
 build_event_record(lwts, TimeBin, AvgBin, SensorIDBin, DataBin) ->
-  WarningHeader = <<"RS001 Warning! LOWER_TS Crossed at: ">>,
+  WarningHeader = <<"XXXX Warning! LOWER_TS Crossed at: ">>,
   Space = <<" / Avg: ">>,
   Unit = <<" C - Received From Sensor: ">>,
   Reading = <<" - Reading: ">>,
@@ -227,3 +230,19 @@ build_event_record(lwts, TimeBin, AvgBin, SensorIDBin, DataBin) ->
 
 reverse([]) -> [];
 reverse([H | T]) -> reverse(T) ++ [H].
+
+serialize_nodes([H | T]) ->
+  NodesBin = atom_to_binary(H, utf8),
+  serialize_nodes(T, NodesBin);
+
+serialize_nodes([]) ->
+  <<"">>.
+
+serialize_nodes([H | T], NodesBin) ->
+  Node = atom_to_binary(H, utf8),
+  Space = <<" / ">>,
+  NewNodesBin = <<NodesBin/binary, Space/binary, Node/binary>>,
+  serialize_nodes(T, NewNodesBin);
+
+serialize_nodes([], NodesBin) ->
+  NodesBin.

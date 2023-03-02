@@ -1,5 +1,5 @@
 PROJECT = regional_server
-PROJECT_DESCRIPTION = Cowboy REST Hello World example
+PROJECT_DESCRIPTION = Regional Monitoring Server
 PROJECT_VERSION = 1
 
 DEPS = cowboy

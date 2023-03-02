@@ -20,5 +20,8 @@ start_link() ->
 %% supervisor.
 
 init([]) ->
+	Cookie = monitoring_cookie,
+	Node = node(),
+	erlang:set_cookie(Node, Cookie),
 	Procs = [],
 	{ok, {{one_for_one, 10, 10}, Procs}}.

@@ -10,12 +10,16 @@
 -export([stop/1]).
 -export([start_task/2]).
 -export([rpc_task/2]).
+
+-import(listener_task, [start_monitoring_listener/1]).
+
 %% API.
 %% This function is called by cowboy Makefile
 start(_Type, _Args) ->
 	start_task(avg, average_calc_task),
 	start_task(log, data_log_task),
 	start_task(event, event_handler_task),
+	start_monitoring_listener(listener_task),
 	Dispatch = cowboy_router:compile([
 		{'_', [
 			{"/", toppage_h, []}
