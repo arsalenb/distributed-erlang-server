@@ -1,3 +1,0 @@
-#!/bin/bash
-echo \{bar, $REL_NAME, \'$NAME\', $COOKIE\}.
-exit 0

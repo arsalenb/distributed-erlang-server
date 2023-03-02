@@ -1,6 +1,0 @@
--sname shellcheck_test
-
--setcookie shellcheck_test_cookie
-
-+K true
-+A30

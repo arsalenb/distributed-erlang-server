@@ -1,3 +1,0 @@
-#!/bin/sh
-
-erl_eval "application:which_applications()."

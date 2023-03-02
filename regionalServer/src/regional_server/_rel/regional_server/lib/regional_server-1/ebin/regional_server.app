@@ -1,9 +1,0 @@
-{application, 'regional_server', [
-	{description, "Cowboy REST Hello World example"},
-	{vsn, "1"},
-	{modules, ['average_calc_task','data_log_task','event_handler_task','msg_formatting','regional_server_app','regional_server_sup','toppage_h']},
-	{registered, [regional_server_sup]},
-	{applications, [kernel,stdlib,cowboy]},
-	{mod, {regional_server_app, []}},
-	{env, []}
-]}.

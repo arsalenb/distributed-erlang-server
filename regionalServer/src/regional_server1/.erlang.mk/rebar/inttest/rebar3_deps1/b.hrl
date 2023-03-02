@@ -1,1 +1,0 @@
--define(HELLO, "Hi From B").

@@ -1,3 +1,0 @@
-#!/bin/bash
-# $*
-echo \{pre_stop, $REL_NAME, \'$NAME\', $COOKIE\}. >> test

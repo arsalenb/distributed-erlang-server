@@ -1,3 +1,0 @@
-#!/bin/bash
-# $*
-echo \{status, $REL_NAME, \'$NAME\', $COOKIE\}.
