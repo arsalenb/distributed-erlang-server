@@ -9,8 +9,8 @@
 -module(msg_formatting).
 -author("brunocasu").
 
-%% API
--export([build_html_data_table/0, build_json_data_table/0, build_event_message/0]).
+%% API - Provides a static HTML page with information of 2 sensors and the Event Table
+-export([build_html_data_table/0, build_event_record/5]).
 
 -import(average_calc_task, [return_avg/1]).
 -import(data_log_task, [log_access/4]).
@@ -38,21 +38,19 @@ build_html_data_table() ->
   AvgList = float_to_list(AvgFloat, [{decimals, 2}]),
   io:fwrite("~p~n", ["Average:"]),
   io:fwrite("~p~n", [AvgList]),
-  %io:fwrite("~p~n", [binary_to_list(StatusBin)]),
   AvgBin = float_to_binary(AvgFloat, [{decimals, 2}]),
   Unit = <<"<span>&#176;</span>C</h2>">>,
   %CloseHeader = <<"</h2>">>,
   HeaderWithAvg = <<Header/binary, AvgBin/binary, Unit/binary>>, %StatusBin/binary, CloseHeader/binary>>,
-  TableHeader = <<"<h3>&nbsp;&nbsp;&nbsp;&nbsp;
+  TableHeader = <<"<h3>&nbsp;&nbsp
   SENSOR 001	DATA LOG
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	&nbsp;&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;
 	SENSOR 002 DATA LOG
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	WARNINGS/EVENTS</h3>">>,
-  {DataLog1, TimeLog1} = log_access(read, id001, [], []),
-  {DataLog2, TimeLog2} = log_access(read, id002, [], []),
+  {DataLog1, TimeLog1, DataLog2, TimeLog2} = log_access(read, [], [], []),
   EventLog = event_handler(read, []),
   Table = build_data_table(reverse(DataLog1), reverse(TimeLog1), reverse(DataLog2), reverse(TimeLog2), reverse(EventLog)),
   Body = <<BodyTitle/binary, HeaderWithAvg/binary, TableHeader/binary, Table/binary, BodyEnd/binary>>,
@@ -207,9 +205,25 @@ build_data_table([], [], [], [], [EH | ET], TableBin) ->
 build_data_table([], [], [], [], [], TableBin) ->
   TableBin.
 
-build_json_data_table() -> []. %% TODO
+build_event_record(upts, TimeBin, AvgBin, SensorIDBin, DataBin) ->
+  WarningHeader = <<"RS001 Warning! UPPER_TS Crossed at: ">>,
+  Space = <<" / Avg: ">>,
+  Unit = <<" C - Received From Sensor: ">>,
+  Reading = <<" - Reading: ">>,
+  End = <<" C">>,
+  EventRecordBin = <<WarningHeader/binary, TimeBin/binary, Space/binary,
+    AvgBin/binary, Unit/binary, SensorIDBin/binary, Reading/binary, DataBin/binary, End/binary>>,
+  binary_to_list(EventRecordBin);
 
-build_event_message() -> []. %% TODO
+build_event_record(lwts, TimeBin, AvgBin, SensorIDBin, DataBin) ->
+  WarningHeader = <<"RS001 Warning! LOWER_TS Crossed at: ">>,
+  Space = <<" / Avg: ">>,
+  Unit = <<" C - Received From Sensor: ">>,
+  Reading = <<" - Reading: ">>,
+  End = <<" C">>,
+  EventRecordBin = <<WarningHeader/binary, TimeBin/binary, Space/binary,
+    AvgBin/binary, Unit/binary, SensorIDBin/binary, Reading/binary, DataBin/binary, End/binary>>,
+  binary_to_list(EventRecordBin).
 
 reverse([]) -> [];
 reverse([H | T]) -> reverse(T) ++ [H].

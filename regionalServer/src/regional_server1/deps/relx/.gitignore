@@ -1,0 +1,19 @@
+_build
+.rebar3
+deps/*
+ebin/*
+*.beam
+.eunit
+.relx_plt
+relx
+relx.cmd
+priv/templates/*.erl
+# This is a generated file that should be ignored
+src/rcl_goal.erl
+logs
+test/*_data
+_rel/*
+erl_crash.dump
+rebar
+TEST-*
+tags

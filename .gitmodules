@@ -1,3 +1,6 @@
 [submodule "regionalServer/src/cowboy"]
 	path = regionalServer/src/cowboy
 	url = https://github.com/ninenines/cowboy
+[submodule "centralServer/src/cowboy"]
+	path = centralServer/src/cowboy
+	url = https://github.com/ninenines/cowboy

@@ -11,6 +11,9 @@
 
 %% Called when cowboy listener receives a message
 init(Req0, Opts) ->
+	Cookie = monitoring_cookie,
+	Node = node(),
+	erlang:set_cookie(Node, Cookie),
 	io:fwrite("~p~n", ["Message Received..."]),
 	Method = cowboy_req:method(Req0),
 	HasBody = cowboy_req:has_body(Req0),
@@ -29,18 +32,12 @@ server_request_handler(<<"POST">>, true, Req0) ->
 			%% Send data to Event Handler (Save data in the logs, compute the Average Temperature on the region and manage events)
 			event_handler(write_data, PostContentBin);
 
-		"event" -> %% Sent by the other monitoring servers - contains source server ID, Type of event, Data value and Timestamp
-			io:fwrite("~p~n", ["Event Received..."]),
-			server_reply(<<"Regional Server ID: RS001 Echo">>, Req),
-			%% Send event to Event Handler (Save the event information in the logs)
-			event_handler(write_event, PostContentBin);
-
 		_ -> server_reply(undefined, Req)
 	end;
 
 server_request_handler(<<"GET">>, _, Req0) ->
 	io:fwrite("~p~n", ["GET Handler..."]),
-	Body = build_html_data_table(),
+	Body = build_html_data_table(), %% Provides the Static HTML page with Sensor data and Event information
 	server_reply_html(Body, Req0);
 
 server_request_handler(<<"POST">>, false, Req) ->

@@ -1,0 +1,28 @@
+name: Windows Test
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    name: Test on OTP ${{ matrix.otp_version }} and ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # Cannot test OTP 21 due to https://bugs.erlang.org/browse/ERL-644 (see also https://github.com/elixir-lang/elixir/issues/7774)
+        otp_version: [22, 23, 24]
+        os: [windows-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: erlef/setup-beam@v1
+      with:
+        otp-version: ${{ matrix.otp_version }}
+    - name: Run test
+      run: shelltests/wintest.ps1
