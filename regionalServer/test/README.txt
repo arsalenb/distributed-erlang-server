@@ -14,16 +14,11 @@ Regional Monitoring Server Testing
     -> server_comm_test.send_data()
     
 - Test Node connection:
+    -> configure CENTRAL_SERVER_NODE in the toppage code
     -> create a test node:
-    -> erl -sname regional_serverN@localhost -setcookie 'monitoring_cookie'
+    -> erl -sname central_server@localhost -setcookie 'monitoring_cookie'
     -> the server is configured to send an event message to this node when a threshold cross happens
     -> setup a listening function:
-    -> register (event_comm, self()).
-    -> receive {Event, From} -> Event end.
+    -> register (data_comm, self()).
+    -> receive {{ID, Data, DataType}, From} -> ID,Data,DataType end.
     
-    -> create a second test node:
-    -> erl -sname regional_serverK@localhost -setcookie 'monitoring_cookie'
-    -> send an event message to the regional_server:
-    -> {event_comm, regional_server@localhost} ! {["TESTING EVENT TRANSMISSION"], self()}.
-    
-    -> check envent list at 'http://localhost:8080/'

@@ -13,29 +13,29 @@ from time import sleep
 ## cow_qs.erl -> the parse function reads the characters from the binary form and copies to an erlang list
 ## the parse function uses the '&' to seaparate key value pairs in the string
 ## the data string format to be sent in the POST request is then: key1=value1&key2=value2&key3=value3...
-## example_string = 'msg_type=data_tx&sensor_id=001&sensor_data=20&time=2022/01/02T00:01:20
+## example_string = 'sensor_id=001&sensor_data=20&&sensor_data_type=temperature
 
-def send_rand_data(SERVER_URL='http://localhost:8080', LOW=10, HIGH=30, Reps=10, Delay=3):
+def send_rand_data(SERVER_URL='http://localhost:8080', Reps=10, Delay=3):
     for i in range(Reps):
         timestamp = datetime.now().isoformat(timespec='seconds') 
-        random_data1 = random.randint(LOW, HIGH)
-        string_to_send = 'msg_type=data_tx&sensor_id=AAA&sensor_data='+str(random_data1)+'&time=' + str(timestamp)
+        random_data1 = random.randint(10, 30)
+        string_to_send = 'sensor_id=R1S1&sensor_data='+str(random_data1)+'&sensor_data_type=temperature'
         r = requests.post(SERVER_URL, data = string_to_send)
         sleep(random.randint(1, Delay))
         
         timestamp = datetime.now().isoformat(timespec='seconds') 
-        random_data2 = random.randint(LOW, HIGH)
-        string_to_send = 'msg_type=data_tx&sensor_id=BBB&sensor_data='+str(random_data2)+'&time=' + str(timestamp)
+        random_data2 = random.randint(85, 99)
+        string_to_send = 'sensor_id=R1S2&sensor_data='+str(random_data2)+'&sensor_data_type=humidity'
         r = requests.post(SERVER_URL, data = string_to_send)
         sleep(random.randint(1, Delay))
-        print('Sensor AAA: ', random_data1, ' / Sensor BBB: ', random_data2)
+        print('Sensor R1S1: ', random_data1, ' / Sensor R1S2: ', random_data2)
 
-def send_data(SERVER_URL='http://localhost:8080', SensorID='AAA', Data=20):
+def send_data(SERVER_URL='http://localhost:8080', SensorID='R1S1', Data=20, DataType='temperature'):
     timestamp = datetime.now().isoformat(timespec='seconds') 
-    string_to_send = 'msg_type=data_tx&sensor_id='+SensorID+'&sensor_data='+str(Data)+'&time='+str(timestamp)
+    string_to_send = 'sensor_id='+SensorID+'&sensor_data='+str(Data)+'&sensor_data_type='+DataType
     r = requests.post(SERVER_URL, data = string_to_send)
     print(r.text)
     
     
-send_rand_data_tx()
+send_rand_data()
 

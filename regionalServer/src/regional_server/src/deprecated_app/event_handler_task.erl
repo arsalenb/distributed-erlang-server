@@ -32,7 +32,6 @@ handle({write_data, PostContentBin}, EventList) ->
   SENSOR_ID1 = <<"AAA">>,
   SENSOR_ID2 = <<"BBB">>,
   CENTRAL_SERVER_NODE = central_server@localhost,
-  CONNECTED_REGIONAL_SERVER_NODE = regional_serverN@localhost,
   %% Retrieving the information in the POST message sent by the sensor node
   SensorIDBin = proplists:get_value(<<"sensor_id">>, PostContentBin),
   DataBin = proplists:get_value(<<"sensor_data">>, PostContentBin),
@@ -55,8 +54,8 @@ handle({write_data, PostContentBin}, EventList) ->
     AvgFloat > UPPER_TS_VAL -> %% Upper Temp Threshold Crossed
       io:fwrite("~p~n", ["Upper Temp Threshold Crossed..."]),
       EventRecord = build_event_record(upts, TimeBin, AvgBin, SensorIDBin, DataBin),
-      %% Send event message to other regional servers
-      {event_comm, CONNECTED_REGIONAL_SERVER_NODE} ! {EventRecord, self()},
+      %% Send event message to other regional servers - REMOVED
+      %% {event_comm, CONNECTED_REGIONAL_SERVER_NODE} ! {EventRecord, self()},
       %% Store Event record
       if
         length(EventList) < MAX_RECORD_SIZE -> %% Maximum size of Record is 50 readings
@@ -69,8 +68,8 @@ handle({write_data, PostContentBin}, EventList) ->
     AvgFloat < LOWER_TS_VAL -> %% Lower Temp Threshold Crossed
       io:fwrite("~p~n", ["Lower Temp Threshold Crossed..."]),
       EventRecord = build_event_record(lwts, TimeBin, AvgBin, SensorIDBin, DataBin),
-      %% Send event message to other regional servers
-      {event_comm, CONNECTED_REGIONAL_SERVER_NODE} ! {EventRecord, self()},
+      %% Send event message to other regional servers - REMOVED
+      %% {event_comm, CONNECTED_REGIONAL_SERVER_NODE} ! {EventRecord, self()},
       %% Store Event record
       if
         length(EventList) < MAX_RECORD_SIZE -> %% Maximum size of Record is 50 readings
