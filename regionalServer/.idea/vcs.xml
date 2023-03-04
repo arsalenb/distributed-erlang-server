@@ -3,7 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/cowboy" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/regional_server/.erlang.mk/rebar" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/regional_server/deps/cowboy" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/regional_server/deps/cowlib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/regional_server/deps/ranch" vcs="Git" />

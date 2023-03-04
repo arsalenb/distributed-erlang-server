@@ -1,7 +1,7 @@
 %% Feel free to use, reuse and abuse the code in this file.
 
 %% @private
--module(websocket_sup).
+-module(central_server_sup).
 -behaviour(supervisor).
 
 %% API.
@@ -19,5 +19,8 @@ start_link() ->
 %% supervisor.
 
 init([]) ->
+	Cookie = monitoring_cookie,
+	Node = node(),
+	erlang:set_cookie(Node, Cookie),
 	Procs = [],
 	{ok, {{one_for_one, 10, 10}, Procs}}.

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/central_server/deps/cowboy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/central_server/deps/cowlib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/central_server/deps/ranch" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/central_server/deps/relx" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/cowboy" vcs="Git" />
+  </component>
+</project>

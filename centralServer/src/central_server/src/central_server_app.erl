@@ -1,7 +1,7 @@
 %% Feel free to use, reuse and abuse the code in this file.
 
 %% @private
--module(websocket_app).
+-module(central_server_app).
 -behaviour(application).
 
 %% API.
@@ -12,15 +12,13 @@
 start(_Type, _Args) ->
 	Dispatch = cowboy_router:compile([
 		{'_', [
-			{"/", cowboy_static, {priv_file, websocket, "index.html"}},
-			{"/websocket", ws_h, []},
-			{"/static/[...]", cowboy_static, {priv_dir, websocket, "static"}}
+			{"/central_server", ws_h, []}
 		]}
-	]),
-	{ok, _} = cowboy:start_clear(http, [{port, 8080}], #{
+	]),																%% DEFAULT IP AND PORT
+	{ok, _} = cowboy:start_clear(http, [{ip, {127,0,1,1}},{port, 8080}], #{
 		env => #{dispatch => Dispatch}
 	}),
-	websocket_sup:start_link().
+	central_server_sup:start_link().
 
 stop(_State) ->
 	ok = cowboy:stop_listener(http).

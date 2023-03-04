@@ -15,7 +15,7 @@ from time import sleep
 ## the data string format to be sent in the POST request is then: key1=value1&key2=value2&key3=value3...
 ## example_string = 'sensor_id=001&sensor_data=20&&sensor_data_type=temperature
 
-def send_rand_data(SERVER_URL='http://localhost:8080', Reps=10, Delay=3):
+def send_rand_data(SERVER_URL='http://127.0.0.1:8080', Reps=10, Delay=3):
     for i in range(Reps):
         timestamp = datetime.now().isoformat(timespec='seconds') 
         random_data1 = random.randint(10, 30)
@@ -30,7 +30,7 @@ def send_rand_data(SERVER_URL='http://localhost:8080', Reps=10, Delay=3):
         sleep(random.randint(1, Delay))
         print('Sensor R1S1: ', random_data1, ' / Sensor R1S2: ', random_data2)
 
-def send_data(SERVER_URL='http://localhost:8080', SensorID='R1S1', Data=20, DataType='temperature'):
+def send_data(SERVER_URL='http://127.0.0.1:8080', SensorID='R1S1', Data=20, DataType='temperature'):
     timestamp = datetime.now().isoformat(timespec='seconds') 
     string_to_send = 'sensor_id='+SensorID+'&sensor_data='+str(Data)+'&sensor_data_type='+DataType
     r = requests.post(SERVER_URL, data = string_to_send)

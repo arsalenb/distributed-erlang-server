@@ -22,9 +22,9 @@ start(_Type, _Args) ->
 	%% start_monitoring_listener(listener_task), %% Removed Communication between regional servers
 	Dispatch = cowboy_router:compile([
 		{'_', [
-			{"/", toppage_h, []}
+			{"/regional_server", toppage_h, []}
 		]}
-	]),
+	]),																	%% DEFAULT IP AND PORT
 	{ok, _} = cowboy:start_clear(http, [{ip, {127,0,0,1}},{port, 8080}], #{ %% ranch.erl line 340
 		env => #{dispatch => Dispatch}
 	}),
