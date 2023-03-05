@@ -22,12 +22,14 @@ server_request_handler(<<"POST">>, true, Req0) ->
 	io:fwrite("~p~n", ["POST Handler..."]),
 	{ok, PostContentBin, Req} = cowboy_req:read_urlencoded_body(Req0),
 	server_reply(<<"Regional Server Echo">>, Req),
+	SERVER_ID = <<"RSXX">>, %% DEFAULT VALUE
 	SensorIDBin = proplists:get_value(<<"sensor_id">>, PostContentBin),
 	DataBin = proplists:get_value(<<"sensor_data">>, PostContentBin),
 	DataTypeBin = proplists:get_value(<<"sensor_data_type">>, PostContentBin),
+	TimeBin = proplists:get_value(<<"time">>, PostContentBin),
 	%% Forward Data to websocket - PID at receiver is data_comm
 	CENTRAL_SERVER_NODE = central_server@central,
-	{data_comm, CENTRAL_SERVER_NODE} ! {{SensorIDBin, DataBin, DataTypeBin}, self()};
+	{data_comm, CENTRAL_SERVER_NODE} ! {{SERVER_ID, SensorIDBin, DataBin, DataTypeBin, TimeBin}, self()};
 	%% event_handler(write_data, PostContentBin); %% Removed event handler
 
 server_request_handler(<<"GET">>, _, Req0) ->

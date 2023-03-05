@@ -15,24 +15,24 @@ from time import sleep
 ## the data string format to be sent in the POST request is then: key1=value1&key2=value2&key3=value3...
 ## example_string = 'sensor_id=001&sensor_data=20&&sensor_data_type=temperature
 
-def send_rand_data(SERVER_URL='http://127.0.0.1:8080', Reps=10, Delay=3):
+def send_rand_data(SERVER_URL='http://10.2.1.27:8080/regional_server', Reps=10, Delay=3):
     for i in range(Reps):
         timestamp = datetime.now().isoformat(timespec='seconds') 
         random_data1 = random.randint(10, 30)
-        string_to_send = 'sensor_id=R1S1&sensor_data='+str(random_data1)+'&sensor_data_type=temperature'
+        string_to_send = 'sensor_id=TS01&sensor_data='+str(random_data1)+'&sensor_data_type=temperature&time='+timestamp
         r = requests.post(SERVER_URL, data = string_to_send)
         sleep(random.randint(1, Delay))
         
         timestamp = datetime.now().isoformat(timespec='seconds') 
         random_data2 = random.randint(85, 99)
-        string_to_send = 'sensor_id=R1S2&sensor_data='+str(random_data2)+'&sensor_data_type=humidity'
+        string_to_send = 'sensor_id=HS01&sensor_data='+str(random_data2)+'&sensor_data_type=humidity&time='+timestamp
         r = requests.post(SERVER_URL, data = string_to_send)
         sleep(random.randint(1, Delay))
-        print('Sensor R1S1: ', random_data1, ' / Sensor R1S2: ', random_data2)
+        print('Sensor TS01: ', random_data1, ' / Sensor HS01: ', random_data2)
 
-def send_data(SERVER_URL='http://127.0.0.1:8080', SensorID='R1S1', Data=20, DataType='temperature'):
+def send_data(SERVER_URL='http://10.2.1.27:8080/regional_server', SensorID='TS01', Data=20, DataType='temperature'):
     timestamp = datetime.now().isoformat(timespec='seconds') 
-    string_to_send = 'sensor_id='+SensorID+'&sensor_data='+str(Data)+'&sensor_data_type='+DataType
+    string_to_send = 'sensor_id='+SensorID+'&sensor_data='+str(Data)+'&sensor_data_type='+DataType+'&time='+timestamp
     r = requests.post(SERVER_URL, data = string_to_send)
     print(r.text)
     
