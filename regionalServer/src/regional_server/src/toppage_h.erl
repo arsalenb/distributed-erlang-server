@@ -28,7 +28,7 @@ server_request_handler(<<"POST">>, true, Req0) ->
 	DataTypeBin = proplists:get_value(<<"sensor_data_type">>, PostContentBin),
 	TimeBin = proplists:get_value(<<"time">>, PostContentBin),
 	%% Forward Data to websocket - PID at receiver is data_comm
-	CENTRAL_SERVER_NODE = central_server@central,
+	CENTRAL_SERVER_NODE = erl_comm_interface@central,
 	{data_comm, CENTRAL_SERVER_NODE} ! {{SERVER_ID, SensorIDBin, DataBin, DataTypeBin, TimeBin}, self()};
 	%% event_handler(write_data, PostContentBin); %% Removed event handler
 

@@ -13,12 +13,4 @@ Regional Monitoring Server Testing
     -> server_comm_test.send_rand_data()
     -> server_comm_test.send_data()
     
-- Test Node connection:
-    -> configure CENTRAL_SERVER_NODE in the toppage code
-    -> create a test node:
-    -> erl -sname central_server@localhost -setcookie 'monitoring_cookie'
-    -> the server is configured to send an event message to this node when a threshold cross happens
-    -> setup a listening function:
-    -> register (data_comm, self()).
-    -> receive {{ID, Data, DataType}, From} -> ID,Data,DataType end.
     
