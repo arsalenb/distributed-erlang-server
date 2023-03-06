@@ -5,14 +5,16 @@
 -export([websocket_handle/2]).
 -export([websocket_info/2]).
 
--import(listener_task, [start_monitoring_listener/2]).
+-import(listener_task, [start_monitoring_listener/1]).
 
 init(Req, State) ->
 	{cowboy_websocket, Req, State, #{
 		idle_timeout => 6000000}}. %% 100 min timeout
 
 websocket_init(State) ->
-	start_monitoring_listener(listener_task, self()),
+	io:fwrite("~p~n", ["new connection..."]),
+	io:fwrite("~p~n", [self()]),
+	start_monitoring_listener(self()),
 	{[], State}.
 
 websocket_handle(_Data, State) ->
@@ -20,6 +22,7 @@ websocket_handle(_Data, State) ->
 
 websocket_info({ServerID, SensorID, Data, DataType, Time}, State) ->
 	Body = build_json_reply(ServerID, SensorID, Data, DataType, Time),
+	io:fwrite("~p~n", ["websocket stream..."]),
 	{[{text, Body}], State};
 websocket_info(_Info, State) ->
 	{[], State}.

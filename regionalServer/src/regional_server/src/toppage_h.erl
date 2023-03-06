@@ -11,7 +11,7 @@
 
 %% Called when cowboy listener receives a message
 init(Req0, Opts) ->
-	io:fwrite("~p~n", ["Message Received..."]),
+	io:fwrite("~p~n", ["message received..."]),
 	Method = cowboy_req:method(Req0),
 	HasBody = cowboy_req:has_body(Req0),
 	Req = server_request_handler(Method, HasBody, Req0), %% handles the request
@@ -19,21 +19,23 @@ init(Req0, Opts) ->
 
 %% Handler for POST/GET messages
 server_request_handler(<<"POST">>, true, Req0) ->
-	io:fwrite("~p~n", ["POST Handler..."]),
+	io:fwrite("~p~n", ["POST handler..."]),
 	{ok, PostContentBin, Req} = cowboy_req:read_urlencoded_body(Req0),
 	server_reply(<<"Regional Server Echo">>, Req),
-	SERVER_ID = <<"RSXX">>, %% DEFAULT VALUE
+	SERVER_ID = <<"RS01">>, %% DEFAULT VALUE
 	SensorIDBin = proplists:get_value(<<"sensor_id">>, PostContentBin),
+	io:fwrite("~p~n", ["data from..."]),
+	io:fwrite("~p~n", [SensorIDBin]),
 	DataBin = proplists:get_value(<<"sensor_data">>, PostContentBin),
 	DataTypeBin = proplists:get_value(<<"sensor_data_type">>, PostContentBin),
 	TimeBin = proplists:get_value(<<"time">>, PostContentBin),
 	%% Forward Data to websocket - PID at receiver is data_comm
 	CENTRAL_SERVER_NODE = erl_comm_interface@central,
-	{data_comm, CENTRAL_SERVER_NODE} ! {{SERVER_ID, SensorIDBin, DataBin, DataTypeBin, TimeBin}, self()};
+	{interface, CENTRAL_SERVER_NODE} ! {{SERVER_ID, SensorIDBin, DataBin, DataTypeBin, TimeBin}, self()};
 	%% event_handler(write_data, PostContentBin); %% Removed event handler
 
 server_request_handler(<<"GET">>, _, Req0) ->
-	io:fwrite("~p~n", ["GET Handler..."]),
+	io:fwrite("~p~n", ["GET handler..."]),
 	Body = build_static_html(),
 	%% Body = build_html_data_table(), %% Sensor information Removed
 	server_reply_html(Body, Req0);

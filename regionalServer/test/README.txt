@@ -5,7 +5,7 @@ Regional Monitoring Server Testing
     -> in the shell use <make run>
     
 - Check static HTML page: 
-    -> in the browser go to 'http://localhost:8080/'
+    -> in the browser go to 'http://localhost:8080/regional_server'
     
 - Test sending POST messages - Sensor Data
     -> use python functions (run python3)

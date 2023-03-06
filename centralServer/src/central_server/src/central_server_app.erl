@@ -15,10 +15,12 @@ start(_Type, _Args) ->
 			{"/central_server", ws_h, []}
 		]}
 	]),																%% DEFAULT IP AND PORT
-	{ok, _} = cowboy:start_clear(http, [{ip, {127,0,1,1}},{port, 8080}], #{
+	{ok, _} = cowboy:start_clear(http, [{ip, {10,2,1,28}},{port, 8080}], #{
 		env => #{dispatch => Dispatch}
 	}),
 	central_server_sup:start_link().
 
 stop(_State) ->
 	ok = cowboy:stop_listener(http).
+
+

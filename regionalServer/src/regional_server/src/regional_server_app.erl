@@ -25,7 +25,7 @@ start(_Type, _Args) ->
 			{"/regional_server", toppage_h, []}
 		]}
 	]),																	%% DEFAULT IP AND PORT
-	{ok, _} = cowboy:start_clear(http, [{ip, {127,0,0,1}},{port, 8080}], #{ %% ranch.erl line 340
+	{ok, _} = cowboy:start_clear(http, [{ip, {10,2,1,27}},{port, 8080}], #{ %% ranch.erl line 340
 		env => #{dispatch => Dispatch}
 	}),
 	regional_server_sup:start_link().
