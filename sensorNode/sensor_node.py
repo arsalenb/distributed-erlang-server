@@ -9,7 +9,7 @@ SERVER2_URL='http://10.2.1.34:8080/regional_server'
 
 def sensor_send(url=SERVER1_URL, s_id='TS0N', d_type='temperature'):
     t = time.time()
-    timestamp = int(t)
+    timestamp = int(t*1000)
     if d_type == 'temperature':
         reading = random.randint(10, 30)
     elif d_type == 'humidity':
@@ -25,19 +25,32 @@ def ts01_send():
 def hs01_send():
     sensor_send(SERVER1_URL, 'HS01', 'humidity')
 
+def ta01_send():
+    sensor_send(SERVER1_URL, 'TA01', 'temperature')
+
+def ha01_send():
+    sensor_send(SERVER1_URL, 'HA01', 'humidity')
+
 def ts02_send():
     sensor_send(SERVER2_URL, 'TS02', 'temperature')
 
 def hs02_send():
     sensor_send(SERVER2_URL, 'HS02', 'humidity')
 
-def run_test(mode = 1, runs = 600):
+def tb02_send():
+    sensor_send(SERVER2_URL, 'TB02', 'temperature')
+
+def hb02_send():
+    sensor_send(SERVER2_URL, 'HB02', 'humidity')
+
+def run_test(mode = 1, runs = 6):
     if mode == 1:
         for i in range (runs):
             ts01_send()
             sleep(0.5)
             hs01_send()
             sleep(0.5)
+
     elif mode == 2:
         for i in range (runs):
             ts01_send()
@@ -48,6 +61,16 @@ def run_test(mode = 1, runs = 600):
             sleep(0.25)
             hs02_send()
             sleep(0.25)
+
+    elif mode == 3:
+        for i in range (runs):
+            ta01_send()
+            sleep(0.25)
+            ha01_send()
+            sleep(0.25)
+            tb02_send()
+            sleep(0.25)
+            hb02_send()
+            sleep(0.25)
     
-run_test()
 
