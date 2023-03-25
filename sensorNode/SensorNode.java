@@ -1,5 +1,4 @@
-package centralServer.erl_interface;
-
+package sensorNode;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -9,13 +8,14 @@ import java.time.Instant;
 import java.util.Random;
 
 public class SensorNode {
-    private static final String REGIONAL_SERVER_URL = "http://127.0.0.1:8080/regional_server"; // http://10.2.1.28:8080/regional_server
-    private static final int SEND_INTERVAL = 5000;
-
+    private static final String REGIONAL_SERVER_URL = "http://10.2.1.27:8080/regional_server";
+    private static final int SEND_INTERVAL = 1000;
     public static void main(String[] args) {
         while (true) {
             try {
-                sendSensorData();
+
+                sendSensorData("HS01", "humidity");
+                sendSensorData("TS01", "temperature");
                 Thread.sleep(SEND_INTERVAL);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -23,8 +23,8 @@ public class SensorNode {
         }
     }
 
-    private static void sendSensorData() throws Exception {
-        String sensorData = generateSensorData();
+    private static void sendSensorData(String sensorId, String sensorDataType) throws Exception {
+        String sensorData = generateSensorData(sensorId, sensorDataType);
         System.out.println("Generated sensor data: " + sensorData);
         HttpURLConnection connection = null;
 
@@ -59,19 +59,14 @@ public class SensorNode {
         }
     }
 
-    private static String generateSensorData() {
+
+    private static String generateSensorData(String sensorId, String sensorDataType) {
         Random random = new Random();
-        String sensorId;
-        String sensorDataType;
         int sensorData;
 
-        if (random.nextBoolean()) {
-            sensorId = "TS01";
-            sensorDataType = "temperature";
+        if (sensorDataType.equals("temperature")) {
             sensorData = random.nextInt(21) + 10;
         } else {
-            sensorId = "HS01";
-            sensorDataType = "humidity";
             sensorData = random.nextInt(15) + 85;
         }
 
@@ -79,5 +74,6 @@ public class SensorNode {
         return String.format("sensor_id=%s&sensor_data=%d&sensor_data_type=%s&time=%d",
                 sensorId, sensorData, sensorDataType, currentTime);
     }
+
 }
 

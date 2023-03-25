@@ -1,21 +1,6 @@
 -module(erl_interface).
 -author("brunocasu").
 
-%%start_listener(PID) ->
-%%  %% IMPORTANT: data_comm is the PID for the regional servers to send the message
-%%  io:fwrite("~p~n", ["erlang interface listener init..."]),
-%%  register(interface, spawn(fun()->loop(PID) end)).
-%%
-%%loop(PID) ->
-%%  receive
-%%    {Msg, _From} ->
-%%      io:fwrite("~p~n", ["sending to central server listener..."]),
-%%      {data_comm, central_server@Distributed2022} ! {Msg, self()},
-%%      loop(PID)
-%%  end.
-
-%% API
-%% API
 -export([start_listener/1, loop/1, retry_send/4, validate_message/1]).
 
 -define(RETRY_INTERVAL, 1000).
@@ -28,7 +13,6 @@ start_listener(PID) ->
   register(interface, spawn(fun()->loop(PID) end)).
 
 loop(PID) ->
-  io:fwrite("inside loop"),
   receive
     {Msg, _From} ->
       case validate_message(Msg) of
@@ -54,33 +38,62 @@ retry_send(_Msg, _Retries, 0, _PID) ->
 retry_send(_Msg, 0, _Timeout, _PID) ->
   io:fwrite("~p~n", ["Exceeded maximum retries, ignoring message..."]).
 
+
 validate_message(PostContentBin) ->
-  SensorIDBin = proplists:get_value(<<"sensor_id">>, PostContentBin),
-  DataBin = proplists:get_value(<<"sensor_data">>, PostContentBin),
-  DataTypeBin = proplists:get_value(<<"sensor_data_type">>, PostContentBin),
-  TimeBin = proplists:get_value(<<"time">>, PostContentBin),
+  io:fwrite("Received message: ~p~n", [PostContentBin]),
+
+  {ServerID, SensorIDBin, DataBin, DataTypeBin, TimeBin} = PostContentBin,
+
+  ServerIDValid = case ServerID of
+                    <<"RS01">> -> true;
+                    <<"RS02">> -> true;
+                    _ -> false
+                  end,
 
   SensorIDValid = case SensorIDBin of
                     <<"TS01">> -> true;
                     <<"HS01">> -> true;
+                    <<"TA01">> -> true;
+                    <<"HA01">> -> true;
+                    <<"TS02">> -> true;
+                    <<"HS02">> -> true;
+                    <<"TB02">> -> true;
+                    <<"HB02">> -> true;
                     _ -> false
                   end,
 
   DataValid = case DataTypeBin of
                 <<"temperature">> ->
                   case binary_to_integer(DataBin) of
-                    N when N >= 10, N =< 30 -> true;
+                    N when is_integer(N) -> true;
                     _ -> false
                   end;
                 <<"humidity">> ->
                   case binary_to_integer(DataBin) of
-                    N when N >= 85, N =< 99 -> true;
+                    N when is_integer(N) -> true;
                     _ -> false
                   end;
                 _ -> false
               end,
 
-  TimeValid = (length(TimeBin) > 0),
+  TimeValid = case binary_to_integer(TimeBin) of
+                  X when X > 0 -> true;
+                  _ -> false
+                end,
 
-  SensorIDValid and DataValid and TimeValid.
+  ServerIDValid and SensorIDValid and DataValid and TimeValid.
 
+
+
+%%start_listener(PID) ->
+%%  %% IMPORTANT: data_comm is the PID for the regional servers to send the message
+%%  io:fwrite("~p~n", ["erlang interface listener init..."]),
+%%  register(interface, spawn(fun()->loop(PID) end)).
+%%
+%%loop(PID) ->
+%%  receive
+%%    {Msg, _From} ->
+%%      io:fwrite("~p~n", ["sending to central server listener..."]),
+%%      {data_comm, central_server@Distributed2022 } ! {Msg, self()},%% central_server@Distributed2022
+%%      loop(PID)
+%%  end.
