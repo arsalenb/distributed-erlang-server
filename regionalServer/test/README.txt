@@ -6,7 +6,7 @@ Regional Monitoring Server Testing
     
 - Check static HTML page: 
     -> in the browser go to 'http://localhost:8080/regional_server'
-	-> when deployed 'http://10.2.1.27:8080/regional_server' and 'http://10.2.1.34:8080/regional_server'
+	-> when deployed the urls are 'http://10.2.1.27:8080/regional_server' and 'http://10.2.1.34:8080/regional_server'
     
 - Test sending POST messages - Sensor Data
     -> use python functions (run python3)

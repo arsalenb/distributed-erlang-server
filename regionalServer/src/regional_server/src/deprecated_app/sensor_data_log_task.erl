@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 17. Feb 2023 02:25
 %%%-------------------------------------------------------------------
--module(data_log_task).
+-module(sensor_data_log_task).
 -author("brunocasu").
 
 %% API

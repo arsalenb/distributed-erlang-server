@@ -7,5 +7,9 @@
     <mapping directory="$PROJECT_DIR$/src/regional_server/deps/cowlib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/regional_server/deps/ranch" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/regional_server/deps/relx" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/regional_server2/deps/cowboy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/regional_server2/deps/cowlib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/regional_server2/deps/ranch" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/regional_server2/deps/relx" vcs="Git" />
   </component>
 </project>

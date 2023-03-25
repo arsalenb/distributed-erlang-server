@@ -1,0 +1,21 @@
+how to deploy the monitoring platform:
+
+10.2.1.27 ->
+    cd Clones/weather-monitoring-erlang-server/regionalServer/src/regional_server
+    make run
+
+10.2.1.34 ->
+    cd Clones/weather-monitoring-erlang-server/regionalServer/src/regional_server2
+    make run
+
+10.2.1.28 ->
+    cd Clones/weather-monitoring-erlang-server/centralServer/src/central_server
+    make run
+
+new terminal
+10.2.1.28 ->
+    cd Clones/weather-monitoring-erlang-server/centralServer/erl_interface
+    erl -sname erl_comm_interface@central -setcookie 'monitoring_cookie'
+    on erlang interface ->
+        c(erl_interface).
+        erl_interface:start_listener(self()).
