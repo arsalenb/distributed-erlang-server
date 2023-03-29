@@ -33,6 +33,7 @@ function Temperature() {
       >
         <ChartComponent
           data={rs02TemperatureData}
+          colors={["#993955", "#BDC667", "#E9ECF5"]}
           xAxisLabel="Time (Minutes/Seconds)"
           yAxisLabel="Temperature (Celsius)"
         />

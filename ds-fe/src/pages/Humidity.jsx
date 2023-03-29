@@ -22,7 +22,6 @@ function Humidity() {
       >
         <ChartComponent
           data={rs01HumidityData}
-          colors={["#eb3d34", "#e8eb34", "#3440eb"]}
           xAxisLabel="Time (Minutes/Seconds)"
           yAxisLabel="Humidity (%)"
         />
@@ -33,6 +32,7 @@ function Humidity() {
       >
         <ChartComponent
           data={rs02HumidityData}
+          colors={["#EEE3AB", "#A77E58", "#BA3F1D"]}
           xAxisLabel="Time (Minutes/Seconds)"
           yAxisLabel="Humidity (%)"
         />

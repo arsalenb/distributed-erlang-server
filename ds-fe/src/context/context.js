@@ -61,7 +61,7 @@ const Provider = (props) => {
         averagedHumidity /= regionalServerData.humidity.length;
       }
       // Events system
-      if (averagedTemperature > 60) {
+      if (averagedTemperature > 50) {
         setEvents([
           { type: "error", averagedTemperature, serverId, date: Date() },
           ...events,
@@ -139,7 +139,7 @@ const Provider = (props) => {
         setRs02Data(objectConstructor(rs02Data, receivedData));
       }
     }
-  }, [lastMessage]);
+  }, [lastMessage, rs01Data, rs02Data]);
 
   useInterval(
     () => {
